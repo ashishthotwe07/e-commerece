@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import VerifyEmail from "./pages/VerifyEmail";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/" element={<Home />} />
         </Routes>
         <ToastContainer />

@@ -33,8 +33,14 @@ const SignUp = () => {
         email: "",
         password: "",
       });
+      console.log(user);
 
-      navigate("/");
+      // Store user ID and email in session storage
+      sessionStorage.setItem("userId", user.user._id);
+      sessionStorage.setItem("email", user.user.email);
+
+      // Construct the URL with the query parameter
+      navigate(`/verify-email`);
       toast.success("Sign up successful!");
     } catch (error) {
       toast.error(error.message);

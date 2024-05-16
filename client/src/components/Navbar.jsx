@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { FaHome, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { userSelector } from "../redux/reducers/userSlice";
+import { signOutUser, userSelector } from "../redux/reducers/userSlice";
 
 const Navbar = () => {
   const { user } = useSelector(userSelector);
   console.log(user);
 
+  const dispatch = useDispatch();
   const handleLogout = () => {
-    setLoggedIn(false);
+    dispatch(signOutUser());
   };
 
   return (

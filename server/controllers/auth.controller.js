@@ -1,6 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import { generateOTP } from "../config/mail.js";
+import Verification from "../models/verification.model.js";
+import transporter from "../config/nodemailer.js";
+import { isValidObjectId } from "mongoose";
 class AuthController {
   async register(req, res) {
     try {
@@ -26,8 +30,21 @@ class AuthController {
 
       // Create a new user
       const newUser = new User({ username, email, password: hashedPassword });
+      const OTP = generateOTP();
+      const verificationToken = new Verification({
+        owner: newUser._id,
+        token: OTP,
+      });
+
+      await verificationToken.save();
       await newUser.save();
 
+      transporter.sendMail({
+        from: "emailverfication@gmail.com",
+        to: newUser.email,
+        subject: "Verify Your Email Account",
+        html: `<h1>${OTP}</h1>`,
+      });
       // Generate JWT token
       const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
         expiresIn: "7d",
@@ -90,6 +107,102 @@ class AuthController {
       res.status(200).json({ message: "User signed out successfully" });
     } catch (error) {
       console.error("Error signing out user:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  async verify(req, res) {
+    const { userId, otp } = req.body;
+    console.log(otp);
+    console.log(userId);
+    if (!userId || !otp) {
+      return res
+        .status(400)
+        .json({ message: "Invalid Request , Missing Parameters" });
+    }
+
+    if (!isValidObjectId(userId)) {
+      return res.status(400).json({ message: "Invalid User id" });
+    }
+
+    const user = await User.findById(userId);
+    console.log(user);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "User is not present with this user id" });
+    }
+
+    if (user.verified) {
+      return res.status(400).json({ message: "User is Already Verified" });
+    }
+
+    const verificationToken = await Verification.findOne({ owner: user._id });
+    console.log(verificationToken);
+
+    if (!verificationToken) {
+      return res.status(400).json({ message: "Verification token not found" });
+    }
+
+    const isMatched = bcrypt.compareSync(otp, verificationToken.token);
+    if (!isMatched) {
+      return res.status(400).json({ message: "Invalid token" });
+    }
+    user.verified = true;
+
+    await Verification.findByIdAndDelete(verificationToken._id);
+    await user.save();
+
+    const { password: _, ...userData } = user.toJSON();
+    res.status(200).json({ message: "Email Verified", user: userData });
+  }
+
+  async resendVerificationEmail(req, res) {
+    try {
+      const { userId } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ message: "Missing user ID" });
+      }
+
+      if (!isValidObjectId(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.verified) {
+        return res.status(400).json({ message: "User is already verified" });
+      }
+
+      // Delete the previous verification token
+      await Verification.deleteOne({ owner: user._id });
+
+      // Generate a new OTP
+      const OTP = generateOTP();
+
+      // Save the new OTP in the database
+      const verificationToken = new Verification({
+        owner: user._id,
+        token: OTP,
+      });
+      await verificationToken.save();
+
+      // Send the verification email with the new OTP
+      transporter.sendMail({
+        from: "emailverification@gmail.com",
+        to: user.email,
+        subject: "OTP Resend request",
+        html: `<h1>${OTP}</h1>`,
+      });
+
+      res.status(200).json({ message: "Verification email sent successfully" });
+    } catch (error) {
+      console.error("Error resending verification email:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
   }
