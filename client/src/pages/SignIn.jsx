@@ -98,6 +98,14 @@ const SignIn = () => {
                 Don't have an account? Sign Up
               </Link>
             </div>
+            <div className="text-sm">
+              <Link
+                to="/forgot-password"
+                className="font-medium text-indigo-600 hover:text-indigo-500"
+              >
+                forgot password
+              </Link>
+            </div>
           </div>
 
           <div>
