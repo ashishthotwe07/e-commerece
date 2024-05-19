@@ -48,7 +48,7 @@ function ResetPassword() {
     <main
       id="content"
       role="main"
-      className="w-96 mx-auto min-h-screen flex items-center justify-center "
+      className="w-96 mx-auto outlet flex items-center justify-center "
     >
       <div className="mt-7 w-96 bg-white rounded-xl shadow-lg border-2 ">
         <div className="p-4 sm:p-7">

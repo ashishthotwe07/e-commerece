@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Hide scrollbar for WebKit browsers */
+* ::-webkit-scrollbar {
+  display: none;
+}
+* {
+  box-sizing: border-box;
+}
+
+.outlet {
+  height: calc(100vh - 70px);
+}

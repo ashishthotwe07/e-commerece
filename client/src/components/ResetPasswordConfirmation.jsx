@@ -6,7 +6,7 @@ function ResetPasswordConfirmation() {
     <main
       id="content"
       role="main"
-      className="w-96 mx-auto min-h-screen flex items-center justify-center"
+      className="w-96 mx-auto outlet flex items-center justify-center"
     >
       <div className="mt-7 w-96 bg-white rounded-xl shadow-lg border-2">
         <div className="p-4 sm:p-7">
@@ -16,7 +16,7 @@ function ResetPasswordConfirmation() {
             </h1>
             <p className="mt-2 text-sm text-gray-600">
               A link to reset your password has been sent to your email. Please
-              check your inbox and follow the instructions.
+              check your inbox.
             </p>
           </div>
 
