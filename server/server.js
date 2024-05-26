@@ -6,7 +6,8 @@ import cloudinary from "cloudinary";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
-
+import ProductRouter from "./routes/product.routes.js";
+import morgan from "morgan";
 dotenv.config();
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors());
+// app.use(morgan('combined'));
 
 // Configure Cloudinary
 cloudinary.config({
@@ -34,6 +36,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/product", ProductRouter);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

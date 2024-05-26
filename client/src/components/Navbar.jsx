@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { FaHome, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { signOutUser, userSelector } from "../redux/reducers/userSlice";
+import { useSelector } from "react-redux";
+import { userSelector } from "../redux/reducers/userSlice";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const Navbar = () => {
   const { user } = useSelector(userSelector);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(1);
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -14,10 +16,10 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white  w-full z-20 top-0 start-0 border-b border-gray-200">
+      <nav className="bg-white w-full z-20 top-0 start-0 border-b border-gray-200">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <a
-            href="https://flowbite.com/"
+          <Link
+            to="/"
             className="flex items-center space-x-3 rtl:space-x-reverse"
           >
             <img
@@ -28,12 +30,12 @@ const Navbar = () => {
             <span className="self-center text-2xl font-semibold whitespace-nowrap">
               Flowbite
             </span>
-          </a>
+          </Link>
           <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             {user ? (
               <Link to={"/profile"}>
                 <img
-                  class="w-10 h-10  rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
+                  className="w-10 h-10 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
                   src={
                     user.avatar && user.avatar.url
                       ? user.avatar.url
@@ -115,6 +117,19 @@ const Navbar = () => {
                 >
                   Contact
                 </NavLink>
+              </li>
+              <li>
+                <Link
+                  to="/cart"
+                  className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 relative"
+                >
+                  <ShoppingCartIcon />
+                  {cartCount > 0 && (
+                    <span className="bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center absolute -top-1 -right-1">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
               </li>
             </ul>
           </div>

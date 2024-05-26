@@ -1,0 +1,21 @@
+import express from "express";
+
+import productController from "../controllers/product.controller.js";
+import upload from "../config/upload.js";
+
+const router = express.Router();
+
+router.post(
+  "/create-product",
+  upload.array("images"),
+  productController.createProduct
+);
+router.get("/", productController.getProducts);
+router.get("/:id", productController.getProduct);
+router.put(
+  "/update-product/:productId",
+  upload.array("images" , 5),
+  productController.updateProduct
+);
+
+export default router;
