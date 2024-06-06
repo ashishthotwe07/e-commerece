@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { userSelector } from "../redux/reducers/userSlice";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -9,6 +9,13 @@ const Navbar = () => {
   const { user } = useSelector(userSelector);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(1);
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to the top of the page whenever location changes
+  }, [location]);
+
+
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -33,7 +40,7 @@ const Navbar = () => {
           </Link>
           <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
             {user ? (
-              <Link to={"/profile"}>
+              <Link to={"/user/profile"}>
                 <img
                   className="w-10 h-10 rounded-full ring-2 ring-gray-300 dark:ring-gray-500"
                   src={

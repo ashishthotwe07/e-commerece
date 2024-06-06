@@ -13,4 +13,8 @@
   height: calc(100vh - 70px);
 }
 
+.profile-tags a.active {
+  border: 2px solid grey;
+}
+
 

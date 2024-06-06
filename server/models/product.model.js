@@ -40,6 +40,11 @@ const productSchema = new Schema(
         },
       },
     ],
+    subcategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Subcategory",
+      required: false, // You can set this to true if subcategory should be mandatory
+    },
     brand: {
       type: String,
     },

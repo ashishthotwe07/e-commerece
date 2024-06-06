@@ -4,8 +4,11 @@ import { isValidObjectId } from "mongoose";
 
 class UserController {
   async updateUser(req, res) {
+   
     try {
       const userId = req.user._id;
+    
+
       const image = req.file;
       const { username, email } = req.body;
 

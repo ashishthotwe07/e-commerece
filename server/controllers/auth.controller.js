@@ -87,7 +87,7 @@ class AuthController {
       }
 
       // Generate JWT token
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
         expiresIn: "7d",
       });
 
@@ -182,12 +182,10 @@ class AuthController {
     // Exclude the password from the user data to be returned
     const { password: _, ...userData } = user.toJSON();
 
-    res
-      .status(200)
-      .json({
-        message: "Your email has been verified successfully.",
-        user: userData,
-      });
+    res.status(200).json({
+      message: "Your email has been verified successfully.",
+      user: userData,
+    });
   }
 
   async resendVerificationEmail(req, res) {
@@ -196,11 +194,9 @@ class AuthController {
 
       // Check if the user ID is provided
       if (!userId) {
-        return res
-          .status(400)
-          .json({
-            message: "User ID is missing. Please provide a valid user ID.",
-          });
+        return res.status(400).json({
+          message: "User ID is missing. Please provide a valid user ID.",
+        });
       }
 
       // Validate the user ID format
@@ -248,18 +244,14 @@ class AuthController {
         html: `<p>Your verification OTP is: <strong>${OTP}</strong></p>`,
       });
 
-      res
-        .status(200)
-        .json({
-          message: "A new verification email has been sent successfully.",
-        });
+      res.status(200).json({
+        message: "A new verification email has been sent successfully.",
+      });
     } catch (error) {
       console.error("Error resending verification email:", error);
-      res
-        .status(500)
-        .json({
-          message: "An internal server error occurred. Please try again later.",
-        });
+      res.status(500).json({
+        message: "An internal server error occurred. Please try again later.",
+      });
     }
   }
 
@@ -278,12 +270,10 @@ class AuthController {
       // Check if a reset token already exists and is still valid (assuming an expiration mechanism)
       const resettoken = await ResetPassword.findOne({ owner: user._id });
       if (resettoken) {
-        return res
-          .status(400)
-          .json({
-            message:
-              "A reset password link has already been sent. Please check your email or try again after one hour.",
-          });
+        return res.status(400).json({
+          message:
+            "A reset password link has already been sent. Please check your email or try again after one hour.",
+        });
       }
 
       const newToken = await generateRandomToken();
@@ -304,20 +294,16 @@ class AuthController {
         html: `<p>Please click <a href="http://localhost:5175/reset-password?token=${newToken}&id=${user._id}">here</a> to reset your password.</p>`,
       });
 
-      res
-        .status(200)
-        .json({
-          message:
-            "A link to reset your password has been sent to your email address.",
-        });
+      res.status(200).json({
+        message:
+          "A link to reset your password has been sent to your email address.",
+      });
     } catch (error) {
       console.error("Error in forgotPassword:", error);
-      res
-        .status(500)
-        .json({
-          message:
-            "An error occurred while processing your request. Please try again later.",
-        });
+      res.status(500).json({
+        message:
+          "An error occurred while processing your request. Please try again later.",
+      });
     }
   }
 
@@ -336,29 +322,23 @@ class AuthController {
       // Check if the provided token is valid
       const resetPasswordToken = await ResetPassword.findOne({ owner: id });
       if (!resetPasswordToken) {
-        return res
-          .status(404)
-          .json({
-            message: "The reset password token is invalid or has expired.",
-          });
+        return res.status(404).json({
+          message: "The reset password token is invalid or has expired.",
+        });
       }
 
       const isTokenValid = bcrypt.compareSync(token, resetPasswordToken.token);
       if (!isTokenValid) {
-        return res
-          .status(400)
-          .json({
-            message: "The reset password token is invalid or has expired.",
-          });
+        return res.status(400).json({
+          message: "The reset password token is invalid or has expired.",
+        });
       }
 
       // Verify the token owner matches the provided user ID
       if (resetPasswordToken.owner.toString() !== id) {
-        return res
-          .status(400)
-          .json({
-            message: "The provided user ID does not match the token owner.",
-          });
+        return res.status(400).json({
+          message: "The provided user ID does not match the token owner.",
+        });
       }
 
       // Find the user associated with the provided user ID
@@ -386,11 +366,9 @@ class AuthController {
         .json({ message: "Your password has been reset successfully." });
     } catch (error) {
       console.error("Error in resetPassword:", error);
-      res
-        .status(500)
-        .json({
-          message: "An internal server error occurred. Please try again later.",
-        });
+      res.status(500).json({
+        message: "An internal server error occurred. Please try again later.",
+      });
     }
   }
 }

@@ -1,7 +1,6 @@
-// models/category.model.js
 import mongoose from "mongoose";
 
-const categorySchema = new mongoose.Schema(
+const subcategorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -13,6 +12,11 @@ const categorySchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
     imageUrl: {
       type: String,
       default: "https://globerec.com/wp-content/uploads/2022/10/consumer.jpeg",
@@ -21,5 +25,5 @@ const categorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
- const Category = mongoose.model("Category", categorySchema);
- export default Category;
+ const Subcategory = mongoose.model("Subcategory", subcategorySchema);
+export default Subcategory;

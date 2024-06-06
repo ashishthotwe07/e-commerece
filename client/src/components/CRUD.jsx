@@ -9,15 +9,16 @@ export default function CRUD() {
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [deleteProductId, setDeleteProductId] = useState(null);
   const [products, setProducts] = useState([]);
-  console.log(products);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/product/");
-        console.log(response.data);
-        setProducts(response.data.product);
+        setProducts(response.data.products);
+        console.log(response)
+        console.log(response.data.product);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -34,6 +35,25 @@ export default function CRUD() {
     setSelectedProductId(id);
     setUpdateModalOpen(true);
     setDropdownOpen(null);
+  };
+
+  const handleDeleteClick = (id) => {
+    setDeleteProductId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/product/${deleteProductId}`
+      );
+      setProducts(
+        products.filter((product) => product._id !== deleteProductId)
+      );
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    } finally {
+      setDeleteProductId(null);
+    }
   };
 
   return (
@@ -88,64 +108,66 @@ export default function CRUD() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.length > 0 &&
-                    products.map((product) => (
-                      <tr key={product._id} className="border-b">
-                        <th
-                          scope="row"
-                          className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap"
+                  {products.map((product) => (
+                    <tr key={product._id} className="border-b">
+                      <th
+                        scope="row"
+                        className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap"
+                      >
+                        {product.name}
+                      </th>
+                      {/* <td className="px-4 py-3">{product.category.name}</td> */}
+                      <td className="px-4 py-3">{product.brand}</td>
+                      <td className="px-4 py-3 max-w-[12rem] truncate">
+                        {product.description}
+                      </td>
+                      <td className="px-4 py-3">{product.price}</td>
+                      <td className="px-4 py-3 flex items-center justify-end relative">
+                        <button
+                          id={`${product.id}-dropdown-button`}
+                          onClick={() => handleDropdownToggle(product._id)}
+                          className="inline-flex items-center text-sm font-medium hover:bg-gray-100 p-1.5 text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none"
+                          type="button"
                         >
-                          {product.name}
-                        </th>
-                        <td className="px-4 py-3">{product.category.name}</td>
-                        <td className="px-4 py-3">{product.brand}</td>
-                        <td className="px-4 py-3 max-w-[12rem] truncate">
-                          {product.description}
-                        </td>
-                        <td className="px-4 py-3">{product.price}</td>
-                        <td className="px-4 py-3 flex items-center justify-end relative">
-                          <button
-                            id={`${product.id}-dropdown-button`}
-                            onClick={() => handleDropdownToggle(product._id)}
-                            className="inline-flex items-center text-sm font-medium hover:bg-gray-100 p-1.5 text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none"
-                            type="button"
+                          {dropdownOpen === product._id ? (
+                            <FiX className="w-5 h-5" />
+                          ) : (
+                            <FiMoreVertical className="w-5 h-5" />
+                          )}
+                        </button>
+                        <div
+                          id={`${product._id}-dropdown`}
+                          className={`${
+                            dropdownOpen === product._id ? "block" : "hidden"
+                          } absolute right-12 border-2 bottom-3 z-10 mt-2 w-44 bg-white rounded divide-y divide-gray-100 shadow-2xl `}
+                        >
+                          <ul
+                            className="py-1 text-sm text-gray-700"
+                            aria-labelledby={`${product._id}-dropdown-button`}
                           >
-                            {dropdownOpen === product._id ? (
-                              <FiX className="w-5 h-5" />
-                            ) : (
-                              <FiMoreVertical className="w-5 h-5" />
-                            )}
-                          </button>
-                          <div
-                            id={`${product._id}-dropdown`}
-                            className={`${
-                              dropdownOpen === product._id ? "block" : "hidden"
-                            } absolute right-12 border-2 top-2 z-10 mt-2 w-44 bg-white rounded divide-y divide-gray-100 shadow-2xl `}
-                          >
-                            <ul
-                              className="py-1 text-sm text-gray-700"
-                              aria-labelledby={`${product._id}-dropdown-button`}
-                            >
-                              <li>
-                                <button
-                                  className="flex items-center w-full py-2 px-4 hover:bg-gray-100"
-                                  onClick={() => handleEditClick(product._id)}
-                                >
-                                  <FiEdit className="mr-2" />
-                                  Edit
-                                </button>
-                              </li>
-                              <li>
-                                <button className="flex items-center w-full py-2 px-4 hover:bg-gray-100">
-                                  <FiTrash className="mr-2" />
-                                  Delete
-                                </button>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                            <li>
+                              <button
+                                className="flex items-center w-full py-2 px-4 hover:bg-gray-100"
+                                onClick={() => handleEditClick(product._id)}
+                              >
+                                <FiEdit className="mr-2" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="flex items-center w-full py-2 px-4 hover:bg-gray-100"
+                                onClick={() => handleDeleteClick(product._id)}
+                              >
+                                <FiTrash className="mr-2" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -153,6 +175,34 @@ export default function CRUD() {
         </div>
       </section>
       {/* End block */}
+
+      {/* Confirmation modal */}
+      {deleteProductId && (
+        <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-75 flex justify-center items-center">
+          <div className="relative bg-white w-96 p-6 sm:p-8 rounded-lg shadow-lg">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+              Confirm Delete
+            </h2>
+            <p className="text-sm sm:text-base text-gray-700 mb-6">
+              Are you sure you want to delete this product?
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setDeleteProductId(null)}
+                className="text-sm sm:text-base text-gray-500 mr-4 hover:text-gray-700 focus:outline-none"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="text-sm sm:text-base text-red-500 hover:text-red-700 focus:outline-none"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       {isCreateModalOpen && (

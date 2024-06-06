@@ -1,37 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { FiX, FiUpload } from "react-icons/fi";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function UpdateModal({ isOpen, onClose, productId }) {
-  console.log(productId);
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
   const [removedImages, setRemovedImages] = useState([]);
   const [color, setColor] = useState("");
   const [product, setProduct] = useState(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [imageIndexToRemove, setImageIndexToRemove] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
 
-  console.log(product);
   useEffect(() => {
-    // Fetch product data based on productId
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
           `http://localhost:5000/api/product/${productId}`
         );
         const fetchedProduct = response.data.product;
-        console.log(fetchProduct);
         setProduct(fetchedProduct);
         setName(fetchedProduct.name);
         setBrand(fetchedProduct.brand);
         setPrice(fetchedProduct.price);
         setCategory(fetchedProduct.category.name);
+        setSubcategory(fetchedProduct.subcategory.name);
         setDescription(fetchedProduct.description);
         setImages(fetchedProduct.images);
         setColor(fetchedProduct.color);
@@ -40,8 +39,36 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/category/get"
+        );
+        setCategories(response.data.categories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    if (category) {
+      const fetchSubcategories = async () => {
+        try {
+          console.log(category);
+          const response = await axios.get(
+            `http://localhost:5000/api/subcategory/get-by-category/${category}`
+          );
+          setSubcategories(response.data.subcategories);
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+        }
+      };
+
+      fetchSubcategories();
+    }
+
     fetchProduct();
-  }, [productId]);
+    fetchCategories();
+  }, [productId, category]);
 
   if (!isOpen || !product) return null;
 
@@ -55,17 +82,12 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
     setNewImages([...newImages, ...filesWithPreviews]);
   };
 
-  // Function to handle removing an image
   const handleRemoveImage = (index) => {
-    const removedImageId = images[index].public_id; // Get the public_id of the removed image
-    setRemovedImages([...removedImages, removedImageId]); // Push it into the removedImages array
+    const removedImageId = images[index].public_id;
+    setRemovedImages([...removedImages, removedImageId]);
     const updatedImages = [...images];
-    updatedImages.splice(index, 1); // Remove the image from the images array
-    setImages(updatedImages); // Update the images state
-  };
-  // Function to confirm and remove an image
-  const confirmRemoveImage = () => {
-    setShowConfirmation(false);
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
   };
 
   const handleSubmit = async (event) => {
@@ -76,25 +98,19 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
     formData.append("brand", brand);
     formData.append("price", price);
     formData.append("categoryName", category);
+    formData.append("subcategoryName", subcategory);
     formData.append("description", description);
     formData.append("color", color);
     formData.append("existingImages", JSON.stringify(images));
 
-    // Append removedImages array directly
     removedImages.forEach((imageId, index) => {
       formData.append(`removedImages[${index}]`, imageId);
     });
 
-    newImages.forEach((image) => {
-      formData.append("images", image);
+    newImages.forEach(({ file }) => {
+      formData.append("images", file);
     });
-    for (const value of formData.values()) {
-      console.log(value);
-    }
-    // Display the key/value pairs
-    for (const pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
+
     try {
       const response = await axios.put(
         `http://localhost:5000/api/product/update-product/${productId}`,
@@ -102,10 +118,11 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
       );
 
       const updatedProduct = response.data;
-      console.log("Product updated successfully", updatedProduct);
+      toast.success(response.data.message);
       onClose();
     } catch (error) {
       console.error("Error updating product:", error);
+      toast.error(error.response.data.message);
     }
   };
 
@@ -118,9 +135,7 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
         className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
       >
         <div className="relative p-4 w-full max-w-2xl max-h-full">
-          {/* Modal content */}
           <div className="relative p-4 bg-white rounded-lg shadow sm:p-5">
-            {/* Modal header */}
             <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5">
               <h3 className="text-lg font-semibold text-gray-900">
                 Update Product
@@ -135,7 +150,6 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
-            {/* Modal body */}
             <form onSubmit={handleSubmit}>
               <div className="grid gap-4 mb-4 sm:grid-cols-2">
                 <div>
@@ -145,7 +159,7 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                     onChange={(e) => setName(e.target.value)}
                     name="name"
                     id="name"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block
                     w-full p-2.5"
                     placeholder="Type product name"
                     required
@@ -158,7 +172,7 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                     onChange={(e) => setBrand(e.target.value)}
                     name="brand"
                     id="brand"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
                     placeholder="Product brand"
                     required
                   />
@@ -170,7 +184,7 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                     onChange={(e) => setPrice(e.target.value)}
                     name="price"
                     id="price"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
                     placeholder="$2999"
                     required
                   />
@@ -180,11 +194,31 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     id="category"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus
+                    :ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                   >
-                    {/* <option value="">{category}</option> */}
-                    <option value="SmartPhones">Smarthpones</option>
-                    <option value="PC">PC</option>
+                    <option value="">Select category</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <select
+                    value={subcategory}
+                    onChange={(e) => setSubcategory(e.target.value)}
+                    id="subcategory"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  >
+                    <option value={subcategory}>{subcategory}</option>
+
+                    {subcategories.map((subcat) => (
+                      <option key={subcat._id} value={subcat.name}>
+                        {subcat.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -194,28 +228,25 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                     onChange={(e) => setColor(e.target.value)}
                     name="color"
                     id="color"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
                     placeholder="Product color"
                   />
                 </div>
 
-                <div
-                  className="sm:col-span-2 flex items
--center space-x-2"
-                >
+                <div className="sm:col-span-2 flex items-center space-x-2">
                   {images.map((image, index) => (
                     <div key={index} className="relative">
                       <img
                         src={image.url}
                         alt={`Product Image ${index + 1}`}
-                        className="w-32 h-32 object-cover rounded-lg"
+                        className="w-24 h-24 object-cover rounded-lg"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(index)}
                         className="absolute top-0 right-0 bg-white rounded-full p-1.5 text-gray-600 hover:bg-gray-200 focus:outline-none"
                       >
-                        <FiX className="w-4 h-4" />
+                        <FiX className="w-3 h-3" />
                       </button>
                     </div>
                   ))}
@@ -273,14 +304,14 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
                     onChange={(e) => setDescription(e.target.value)}
                     id="description"
                     rows={4}
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500"
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Write product description here"
                   />
                 </div>
               </div>
               <button
                 type="submit"
-                className="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Update product
               </button>
@@ -288,29 +319,6 @@ export default function UpdateModal({ isOpen, onClose, productId }) {
           </div>
         </div>
       </div>
-
-      {/* Confirmation modal */}
-      {showConfirmation && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6">
-            <p className="mb-4">Are you sure you want to remove this image?</p>
-            <div className="flex justify-end">
-              <button
-                className="text-gray-500 hover:text-red-500 mr-4"
-                onClick={() => setShowConfirmation(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="text-red-500 hover:text-white hover:bg-red-500 px-4 py-2 rounded-lg"
-                onClick={confirmRemoveImage}
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

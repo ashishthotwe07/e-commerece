@@ -8,6 +8,8 @@ import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import ProductRouter from "./routes/product.routes.js";
 import morgan from "morgan";
+import categoryRouter from "./routes/category.routes.js";
+import subCategory from "./routes/subcategory.js";
 dotenv.config();
 
 const app = express();
@@ -37,6 +39,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/product", ProductRouter);
+app.use("/api/category", categoryRouter);
+app.use("/api/subcategory", subCategory);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

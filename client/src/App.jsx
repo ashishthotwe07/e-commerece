@@ -20,6 +20,12 @@ import ResetPasswordConfirmation from "./components/ResetPasswordConfirmation";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRoute from "./components/AuthRoute";
+import Userprofile from "./components/Userprofile";
+import AdminDashboard from "./components/AdminDashboard";
+import Category from "./pages/CategoryCrud/Category";
+import Subcategory from "./pages/SubcategoryCrud/SubCategory";
+import SubCategoryGrid from "./pages/CategoryPages/SubCategoryGrid";
+import ProductListingPage from "./pages/Products/ProductListingPage";
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -73,12 +79,62 @@ export default function App() {
           ),
         },
         {
-          path: "/profile",
+          path: "/category/:categoryId",
+          element: (
+            <ProtectedRoute>
+              <SubCategoryGrid />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/product-listing/:subcategoryName",
+          element: (
+            <ProtectedRoute>
+              <ProductListingPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/user",
           element: (
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
           ),
+          children: [
+            {
+              path: "profile",
+              element: (
+                <ProtectedRoute>
+                  <Userprofile />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "dashboard",
+              element: (
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "create-category",
+              element: (
+                <ProtectedRoute>
+                  <Category />
+                </ProtectedRoute>
+              ),
+            },
+            {
+              path: "create-subcategory",
+              element: (
+                <ProtectedRoute>
+                  <Subcategory />
+                </ProtectedRoute>
+              ),
+            },
+          ],
         },
       ],
     },

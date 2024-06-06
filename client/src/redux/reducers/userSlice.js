@@ -73,11 +73,15 @@ export const updateUser = createAsyncThunk(
     try {
       // Retrieve the token from local storage
       const token = localStorage.getItem("token");
-      const response = await axios.put(`${userUrl}/update`, userData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.put(
+        `http://localhost:5000/api/user/update`,
+        userData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(
