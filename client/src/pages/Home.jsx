@@ -1,12 +1,12 @@
 import React from "react";
 import HeroComponent from "../components/HeroComponent";
-import CategoryGrid from "./CategoryPages/CategoryGrid";
+import CategoryGridComponent from "../components/category/CategoryGridComponent";
 
 export default function Home() {
   return (
     <div>
       <HeroComponent />
-      <CategoryGrid />
+      <CategoryGridComponent />
     </div>
   );
 }

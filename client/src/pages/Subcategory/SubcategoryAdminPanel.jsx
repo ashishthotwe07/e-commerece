@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FiPlus, FiMoreVertical, FiEdit, FiTrash, FiX } from "react-icons/fi";
 import axios from "axios";
-import CreateSubcategoryModal from "./CreateSubcategoryModal";
-import UpdateSubcategoryModal from "./UpdateSubcategoryModal";
+import CreateSubcategoryForm from "../../components/subcategory/CreateSubcategoryForm";
+import UpdateSubcategoryForm from "../../components/subcategory/UpdateSubcategoryForm";
 
-export default function Subcategory() {
+export default function SubcategoryAdminPanel() {
   const [isCreateSubcategoryModalOpen, setCreateSubcategoryModalOpen] =
     useState(false);
   const [isUpdateSubcategoryModalOpen, setUpdateSubcategoryModalOpen] =
@@ -192,13 +192,13 @@ export default function Subcategory() {
 
       {/* Modals */}
       {isCreateSubcategoryModalOpen && (
-        <CreateSubcategoryModal
+        <CreateSubcategoryForm
           isOpen={isCreateSubcategoryModalOpen}
           onClose={() => setCreateSubcategoryModalOpen(false)}
         />
       )}
       {isUpdateSubcategoryModalOpen && (
-        <UpdateSubcategoryModal
+        <UpdateSubcategoryForm
           isOpen={isUpdateSubcategoryModalOpen}
           onClose={() => setUpdateSubcategoryModalOpen(false)}
           subcategoryId={selectedSubcategoryId}

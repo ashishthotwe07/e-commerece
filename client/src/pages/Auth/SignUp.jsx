@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { signInUser, userSelector } from "../redux/reducers/userSlice";
+import {signUpUser, userSelector } from "../../redux/reducers/userSlice";
 
-const SignIn = () => {
+const SignUp = () => {
   const [formData, setFormData] = useState({
+    username: "",
     email: "",
     password: "",
   });
@@ -25,14 +25,16 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      localStorage.setItem("forgotPasswordEmail", formData.email);
-      const user = await dispatch(signInUser(formData)).unwrap();
+      const user = await dispatch(signUpUser(formData)).unwrap();
       setFormData({
+        username: "",
         email: "",
         password: "",
       });
-      navigate("/"); // Example redirect after successful sign in
-      toast.success("Sign in successful!");
+      sessionStorage.setItem("userId", user.user._id);
+      sessionStorage.setItem("email", user.user.email);
+      navigate(`/verify-email`);
+      toast.success("Sign up successful!");
     } catch (error) {
       toast.error(error.message);
     }
@@ -41,13 +43,31 @@ const SignIn = () => {
   return (
     <>
       <section className="bg-gray-50">
-        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto outlet  lg:py-0">
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto outlet lg:py-0">
           <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                Sign in to your account
+                Create an account
               </h1>
               <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+                <div>
+                  <label
+                    htmlFor="username"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                  >
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    onChange={handleChange}
+                    value={formData.username}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg outline-none focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
+                    placeholder="Username"
+                    required
+                  />
+                </div>
                 <div>
                   <label
                     htmlFor="email"
@@ -60,6 +80,7 @@ const SignIn = () => {
                     name="email"
                     id="email"
                     onChange={handleChange}
+                    value={formData.email}
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg outline-none focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
                     placeholder="name@company.com"
                     required
@@ -77,19 +98,13 @@ const SignIn = () => {
                     name="password"
                     id="password"
                     onChange={handleChange}
+                    value={formData.password}
                     placeholder="••••••••"
                     className="bg-gray-50 border outline-none border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
                     required
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <Link
-                    to={"/forgot-password"}
-                    className="text-sm font-medium text-blue-600 hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
+
                 <button
                   type="submit"
                   className="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
@@ -116,19 +131,21 @@ const SignIn = () => {
                       <span className="sr-only">Loading...</span>
                     </div>
                   ) : (
-                    "Sign in"
+                    "Sign up"
                   )}
                 </button>
+              </form>
+              <div className="flex items-center justify-between">
                 <p className="text-sm font-light text-gray-500">
                   Don’t have an account yet?{" "}
                   <Link
-                    to={"/signup"}
+                    to={"/signin"}
                     className="font-medium text-blue-600 hover:underline"
                   >
-                    Sign up
+                    Sign in
                   </Link>
                 </p>
-              </form>
+              </div>
             </div>
           </div>
         </div>
@@ -137,4 +154,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;

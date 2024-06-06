@@ -3,6 +3,7 @@ import { combineReducers } from "redux";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { userReducer } from "./reducers/userSlice";
+import { productReducer } from "./reducers/productSlice";
 
 // Configuration for redux-persist
 const persistConfig = {
@@ -13,6 +14,7 @@ const persistConfig = {
 // Combine reducers
 const rootReducer = combineReducers({
   userReducer,
+  productReducer,
 });
 
 // Enhance the root reducer with redux-persist

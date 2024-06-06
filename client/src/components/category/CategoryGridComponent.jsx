@@ -4,7 +4,7 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-export default function CategoryGrid() {
+export default function CategoryGridComponent() {
   const scrollRef = useRef(null);
   const [categories, setCategories] = useState([]);
 

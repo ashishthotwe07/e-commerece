@@ -8,7 +8,7 @@ import {
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import CRUD from "../components/CRUD";
+
 
 const Profile = () => {
   const { user } = useSelector(userSelector);

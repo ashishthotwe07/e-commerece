@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FiX } from "react-icons/fi";
 
-export default function CreateCategoryModal({ isOpen, onClose }) {
+export default function CreateCategoryForm({ isOpen, onClose }) {
   const [name, setName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);

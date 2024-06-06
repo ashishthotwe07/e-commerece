@@ -3,7 +3,6 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { userSelector } from "../redux/reducers/userSlice";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const Navbar = () => {
   const { user } = useSelector(userSelector);
@@ -14,8 +13,6 @@ const Navbar = () => {
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to the top of the page whenever location changes
   }, [location]);
-
-
 
   const handleToggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

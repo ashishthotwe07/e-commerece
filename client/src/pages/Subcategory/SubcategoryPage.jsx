@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams, Link } from "react-router-dom";
 import Loading from "../../utils/Loading";
 
-export default function SubCategoryGrid() {
+export default function SubcategoryPage() {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Added isLoading state
   const { categoryId } = useParams();

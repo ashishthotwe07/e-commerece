@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { FiPlus, FiMoreVertical, FiEdit, FiTrash, FiX } from "react-icons/fi";
 import axios from "axios";
-import CreateCategoryModal from "./CreateCategoryModal";
-import UpdateCategoryModal from "./UpdateCategoryModal";
+import CreateCategoryForm from "../../components/category/CreateCategoryForm";
+import UpdateCategoryForm from "../../components/category/UpdateCategoryForm";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchCategories,
+  productSelector,
+} from "../../redux/reducers/productSlice";
 
 const defaultImageUrl = "path/to/default/image.jpg"; // Replace with the path to your default image
 
@@ -15,24 +20,12 @@ export default function Category() {
     useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [categories, setCategories] = useState([]);
-  console.log(categories);
+  const { categories } = useSelector(productSelector);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/api/category/get"
-        );
-        console.log(response.data);
-        setCategories(response.data.categories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-  }, []);
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const handleDropdownToggle = (id) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
@@ -182,13 +175,13 @@ export default function Category() {
 
       {/* Modals */}
       {isCreateCategoryModalOpen && (
-        <CreateCategoryModal
+        <CreateCategoryForm
           isOpen={isCreateCategoryModalOpen}
           onClose={() => setCreateCategoryModalOpen(false)}
         />
       )}
       {isUpdateCategoryModalOpen && (
-        <UpdateCategoryModal
+        <UpdateCategoryForm
           isOpen={isUpdateCategoryModalOpen}
           onClose={() => setUpdateCategoryModalOpen(false)}
           categoryId={selectedCategoryId}

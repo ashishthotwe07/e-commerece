@@ -8,24 +8,24 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
+import SignIn from "./pages/Auth/SignIn";
+import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Home";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import VerifyEmail from "./pages/VerifyEmail";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/Auth/VerifyEmail";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
 import ResetPasswordConfirmation from "./components/ResetPasswordConfirmation";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRoute from "./components/AuthRoute";
 import Userprofile from "./components/Userprofile";
-import AdminDashboard from "./components/AdminDashboard";
-import Category from "./pages/CategoryCrud/Category";
-import Subcategory from "./pages/SubcategoryCrud/SubCategory";
-import SubCategoryGrid from "./pages/CategoryPages/SubCategoryGrid";
-import ProductListingPage from "./pages/Products/ProductListingPage";
+import Category from "./pages/Category/Category";
+import ProductListingPage from "./pages/Product/ProductListingPage";
+import ProductAdminPanel from "./components/product/ProductAdminPanel";
+import SubcategoryPage from "./pages/Subcategory/SubcategoryPage";
+import SubcategoryAdminPanel from "./pages/Subcategory/SubcategoryAdminPanel";
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -82,7 +82,7 @@ export default function App() {
           path: "/category/:categoryId",
           element: (
             <ProtectedRoute>
-              <SubCategoryGrid />
+              <SubcategoryPage />
             </ProtectedRoute>
           ),
         },
@@ -114,7 +114,7 @@ export default function App() {
               path: "dashboard",
               element: (
                 <ProtectedRoute>
-                  <AdminDashboard />
+                  <ProductAdminPanel />
                 </ProtectedRoute>
               ),
             },
@@ -130,7 +130,7 @@ export default function App() {
               path: "create-subcategory",
               element: (
                 <ProtectedRoute>
-                  <Subcategory />
+                  <SubcategoryAdminPanel />
                 </ProtectedRoute>
               ),
             },

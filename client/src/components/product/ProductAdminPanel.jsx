@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FiPlus, FiMoreVertical, FiEdit, FiTrash, FiX } from "react-icons/fi";
 import axios from "axios";
-import CreateModal from "./CreateModal";
-import UpdateModal from "./UpdateModal";
+import CreateProductForm from "./CreateProductForm";
+import UpdateProductForm from "./UpdateProductForm";
 
-export default function CRUD() {
+export default function ProductAdminPanel() {
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
@@ -17,7 +17,7 @@ export default function CRUD() {
       try {
         const response = await axios.get("http://localhost:5000/api/product/");
         setProducts(response.data.products);
-        console.log(response)
+        console.log(response);
         console.log(response.data.product);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -206,13 +206,13 @@ export default function CRUD() {
 
       {/* Modals */}
       {isCreateModalOpen && (
-        <CreateModal
+        <CreateProductForm
           isOpen={isCreateModalOpen}
           onClose={() => setCreateModalOpen(false)}
         />
       )}
       {isUpdateModalOpen && (
-        <UpdateModal
+        <UpdateProductForm
           isOpen={isUpdateModalOpen}
           onClose={() => setUpdateModalOpen(false)}
           productId={selectedProductId}

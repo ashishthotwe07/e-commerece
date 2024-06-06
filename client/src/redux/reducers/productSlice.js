@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const baseUrl = "http://localhost:5000/api/products";
+const baseUrl = "http://localhost:5000/api";
 
 // Async thunk for creating a product
 export const createProduct = createAsyncThunk(
@@ -10,7 +10,7 @@ export const createProduct = createAsyncThunk(
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        `${baseUrl}/create-product`,
+        `${baseUrl}/product/create-product`,
         productData,
         {
           headers: {
@@ -26,27 +26,41 @@ export const createProduct = createAsyncThunk(
   }
 );
 
-export const updateProduct = createAsyncThunk(
-  "product/updateProduct",
-  async ({ productId, productData }, { rejectWithValue }) => {
+// Async thunk for fetching categories
+export const fetchCategories = createAsyncThunk(
+  "category/fetchCategories",
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `${baseUrl}/update-product/${productId}`,
-        productData
-      );
-      return response.data;
+      const response = await axios.get(`${baseUrl}/category/get`);
+
+      return response.data.categories;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
 
-// Other CRUD operations...
+// Async thunk for fetching subcategories based on category
+export const fetchSubcategories = createAsyncThunk(
+  "subcategory/fetchSubcategories",
+  async (categoryId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/subcategory/get-by-category/${categoryId}`
+      );
+      return response.data.subcategories;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 const productSlice = createSlice({
   name: "product",
   initialState: {
     products: [],
+    categories: [],
+    subcategories: [],
     loading: false,
     error: null,
   },
@@ -68,24 +82,27 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload.message;
       })
-      .addCase(updateProduct.pending, (state) => {
+      .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(updateProduct.fulfilled, (state, action) => {
+      .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedProduct = action.payload;
-        // Update the product in the state
-        const index = state.products.findIndex(
-          (product) => product._id === updatedProduct._id
-        );
-        if (index !== -1) {
-          state.products[index] = updatedProduct;
-        }
+        state.categories = action.payload;
       })
-      .addCase(updateProduct.rejected, (state, action) => {
+      .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload.message;
+      })
+      .addCase(fetchSubcategories.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSubcategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subcategories = action.payload;
+      })
+      .addCase(fetchSubcategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
       });
   },
 });

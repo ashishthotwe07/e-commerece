@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { verifyEmail } from "../redux/reducers/userSlice";
+import { verifyEmail } from "../../redux/reducers/userSlice";
 import { useDispatch } from "react-redux";
 
 function VerifyEmail() {
