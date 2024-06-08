@@ -424,6 +424,7 @@ const ProductListingPage = () => {
                 {products.map((product) => (
                   <ProductCard
                     key={product.id}
+                    id={product._id}
                     images={product.images} // Assuming each product object has an imageUrl property
                     name={product.name}
                     price={product.price}

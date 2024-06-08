@@ -10,6 +10,7 @@ import ProductRouter from "./routes/product.routes.js";
 import morgan from "morgan";
 import categoryRouter from "./routes/category.routes.js";
 import subCategory from "./routes/subcategory.js";
+import cartRoutes from "./routes/cart.routes.js";
 dotenv.config();
 
 const app = express();
@@ -41,6 +42,7 @@ app.use("/api/user", userRouter);
 app.use("/api/product", ProductRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/subcategory", subCategory);
+app.use("/api/cart", cartRoutes);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
