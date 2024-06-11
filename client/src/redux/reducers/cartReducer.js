@@ -126,6 +126,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: {
     items: [],
+    totalPrice: 0,
     loading: false,
     error: null,
   },
@@ -137,7 +138,8 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload.cart;
+        state.items = action.payload.cart.items;
+        state.totalPrice = action.payload.cart.totalPrice;
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
@@ -148,7 +150,8 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items.items.push(action.payload);
+        state.items = action.payload.cart.items;
+        state.totalPrice = action.payload.cart.totalPrice;
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;
@@ -159,37 +162,11 @@ const cartSlice = createSlice({
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = state.items.items.filter(
+        state.items = state.items.filter(
           (item) => item.product._id !== action.payload
         );
       })
       .addCase(removeFromCart.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(updateCartItem.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(updateCartItem.fulfilled, (state, action) => {
-        state.loading = false;
-        const { _id, quantity } = action.payload;
-        const item = state.items.find((item) => item._id === _id);
-        if (item) {
-          item.quantity = quantity;
-        }
-      })
-      .addCase(updateCartItem.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(clearCart.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(clearCart.fulfilled, (state) => {
-        state.loading = false;
-        state.items = [];
-      })
-      .addCase(clearCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -198,15 +175,16 @@ const cartSlice = createSlice({
       })
       .addCase(increaseQuantity.fulfilled, (state, action) => {
         state.loading = false;
-
-        console.log("qty", action.payload);
-        const item = state.items.find(
-          (item) => item._id === action.payload._id
-        );
-        if (item) {
-          item.quantity += 1;
-        }
+        const updatedItems = state.items.map((item) => {
+          if (item.product._id === action.payload.cart.items[0].product._id) {
+            return { ...item, quantity: action.payload.cart.items[0].quantity };
+          }
+          return item;
+        });
+        state.items = updatedItems;
+        state.totalPrice = action.payload.cart.totalPrice;
       })
+
       .addCase(increaseQuantity.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -216,13 +194,14 @@ const cartSlice = createSlice({
       })
       .addCase(decreaseQuantity.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("qty", action.payload.cart);
-        const item = state.items.find(
-          (item) => item._id === action.payload.cart.items._id
-        );
-        if (item && item.quantity > 1) {
-          item.quantity -= 1;
-        }
+        const updatedItems = state.items.map((item) => {
+          if (item.product._id === action.payload.cart.items[0].product._id) {
+            return { ...item, quantity: action.payload.cart.items[0].quantity };
+          }
+          return item;
+        });
+        state.items = updatedItems;
+        state.totalPrice = action.payload.cart.totalPrice;
       })
       .addCase(decreaseQuantity.rejected, (state, action) => {
         state.loading = false;

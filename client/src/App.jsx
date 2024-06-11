@@ -27,6 +27,7 @@ import ProductAdminPanel from "./components/product/ProductAdminPanel";
 import SubcategoryPage from "./pages/Subcategory/SubcategoryPage";
 import SubcategoryAdminPanel from "./pages/Subcategory/SubcategoryAdminPanel";
 import CartPage from "./pages/Product/CartPage";
+import ProductDetail from "./pages/Product/ProductDetail";
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -100,6 +101,14 @@ export default function App() {
           element: (
             <ProtectedRoute>
               <CartPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/product-detail/:id",
+          element: (
+            <ProtectedRoute>
+              <ProductDetail />
             </ProtectedRoute>
           ),
         },

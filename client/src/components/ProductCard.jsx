@@ -8,6 +8,7 @@ import {
   fetchCart,
   removeFromCart,
 } from "../redux/reducers/cartReducer";
+import { Link } from "react-router-dom";
 
 const ProductCard = ({ id, images, discount, name, price, rating }) => {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ const ProductCard = ({ id, images, discount, name, price, rating }) => {
   const [loading, setLoading] = useState(false);
 
   // Ensure `isInCart` safely accesses item.product._id
-  const isInCart = items.items.some(
+  const isInCart = items.some(
     (item) => item.product && item.product._id === id
   );
 
@@ -46,9 +47,9 @@ const ProductCard = ({ id, images, discount, name, price, rating }) => {
 
   return (
     <div className="relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
-      <a
+      <Link
         className="relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl"
-        href="#"
+        to={`/product-detail/${id}`}
       >
         <img
           className="object-cover ml-4"
@@ -61,7 +62,7 @@ const ProductCard = ({ id, images, discount, name, price, rating }) => {
             {discount} off
           </span>
         )}
-      </a>
+      </Link>
       <div className="mt-4 px-5 pb-5">
         <a href="#">
           <h5 className="text-xl tracking-tight text-slate-900">{name}</h5>

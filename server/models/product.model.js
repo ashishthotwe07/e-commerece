@@ -43,7 +43,7 @@ const productSchema = new Schema(
     subcategory: {
       type: Schema.Types.ObjectId,
       ref: "Subcategory",
-      required: false, // You can set this to true if subcategory should be mandatory
+      required: false,
     },
     brand: {
       type: String,
@@ -55,19 +55,6 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
-    rating: [
-      {
-        star: {
-          type: Number,
-          required: true,
-        },
-        by: {
-          type: Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-      },
-    ],
     sold: {
       type: Number,
       default: 0,

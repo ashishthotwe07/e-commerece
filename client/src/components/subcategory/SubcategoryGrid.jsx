@@ -4,9 +4,32 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const CategoryGridComponent = () => {
+const SubcategoryGrid = () => {
   const scrollRef = useRef(null);
   const [categories, setCategories] = useState([]);
+
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Added isLoading state
+  const categoryId = "Electronics";
+  console.log();
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/subcategory/get-by-category/${categoryId}`
+        );
+        console.log(response.data.subcategories);
+        setItems(response.data.subcategories);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      } finally {
+        setIsLoading(false); // Set isLoading to false once data is fetched
+      }
+    };
+
+    fetchItems();
+  }, [categoryId]);
 
   const scroll = (direction) => {
     const { current } = scrollRef;
@@ -37,9 +60,11 @@ const CategoryGridComponent = () => {
       <div className="border-b mb-5 flex justify-between text-sm">
         <div className="text-indigo-600 flex items-center pb-2 pr-2 border-b-2 border-indigo-600 uppercase">
           <TbCategory className="mr-3 h-6 cursor-pointer" />
-          <span className="font-semibold inline-block">Categories</span>
+          <span className="font-semibold inline-block">
+            Explore best of {categoryId}
+          </span>
         </div>
-        <Link to="/categories">See All</Link>
+        <Link to={`/category/${categoryId}`}>See All</Link>
       </div>
       <div className="relative">
         <div className="absolute top-1/2 transform z-10 -translate-y-1/2 left-0">
@@ -52,13 +77,13 @@ const CategoryGridComponent = () => {
           ref={scrollRef}
           className="flex overflow-x-auto scroll-smooth no-scrollbar"
         >
-          {categories.map((category, index) => (
+          {items.map((category, index) => (
             <div
               key={index}
               className="rounded overflow-hidden shadow-lg flex flex-col mx-2 min-w-[300px] w-80"
             >
               <div className="relative">
-                <Link to={`/category/${category.name}`}>
+                <Link to={`/product-listing/${category.name}`}>
                   <img
                     className="w-full h-48 object-cover"
                     src={category.imageUrl}
@@ -97,4 +122,4 @@ const CategoryGridComponent = () => {
   );
 };
 
-export default CategoryGridComponent;
+export default SubcategoryGrid;
