@@ -6,10 +6,12 @@ import { CgShoppingCart } from "react-icons/cg";
 import { IoBagHandleSharp, IoHome } from "react-icons/io5";
 
 import { FaUser } from "react-icons/fa";
+import { cartSelector } from "../redux/reducers/cartReducer";
 
 const Navbar = () => {
   const { user } = useSelector(userSelector);
-  const [cartCount, setCartCount] = useState(1);
+  // const [cartCount, setCartCount] = useState(1);
+  const { cartCount } = useSelector(cartSelector);
 
   const location = useLocation();
 
@@ -19,7 +21,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="block w-full  px-4 my-2 py-3 mx-auto text-blue-gray-900 shadow-md bg-white">
+      <nav className="block w-full  px-4 py-3 mx-auto text-blue-gray-900 shadow-md bg-white">
         <div className="flex flex-wrap items-center justify-between text-blue-gray-900 gap-y-4">
           <Link
             to="/"
@@ -100,7 +102,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      <div className="outlet">
+      <div className="outlet bg-gradient-to-r from-blue-200 to-indigo-300">
         <Outlet />
       </div>
     </>

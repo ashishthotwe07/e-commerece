@@ -37,7 +37,7 @@ const CategoryDropdown = ({ showImages = true }) => {
   return (
     <div
       className={`sticky top-0 z-10 overflow-x-auto ${
-        !showImages ? "bg-gray-100 shadow-md" : "bg-white"
+        !showImages ? "bg-gradient-to-r from-blue-200 to-indigo-300 shadow-md" : "bg-gradient-to-r from-blue-200 to-indigo-300"
       }`}
     >
       <nav className="flex items-center justify-center space-x-4">
@@ -45,9 +45,7 @@ const CategoryDropdown = ({ showImages = true }) => {
           {categories.map((category, index) => (
             <li
               key={category._id}
-              className={`p-1 text-sm text-blue-gray-900 ${
-                !showImages ? "shadow-lg rounded-lg bg-white" : ""
-              }`}
+              className={`p-1 text-sm text-blue-gray-900`}
               onMouseEnter={() => handleMouseEnter(category.name)}
               onMouseLeave={handleMouseLeave}
             >

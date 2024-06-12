@@ -126,7 +126,7 @@ const cartSlice = createSlice({
   name: "cart",
   initialState: {
     items: [],
-    totalPrice: 0,
+    cartCount: 0,
     loading: false,
     error: null,
   },
@@ -139,7 +139,10 @@ const cartSlice = createSlice({
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload.cart.items;
-        state.totalPrice = action.payload.cart.totalPrice;
+        state.cartCount = action.payload.cart.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
@@ -151,7 +154,10 @@ const cartSlice = createSlice({
       .addCase(addToCart.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload.cart.items;
-        state.totalPrice = action.payload.cart.totalPrice;
+        state.cartCount = action.payload.cart.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.loading = false;
@@ -165,47 +171,20 @@ const cartSlice = createSlice({
         state.items = state.items.filter(
           (item) => item.product._id !== action.payload
         );
+        state.cartCount = state.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
       })
       .addCase(removeFromCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(increaseQuantity.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(increaseQuantity.fulfilled, (state, action) => {
-        state.loading = false;
-        const updatedItems = state.items.map((item) => {
-          if (item.product._id === action.payload.cart.items[0].product._id) {
-            return { ...item, quantity: action.payload.cart.items[0].quantity };
-          }
-          return item;
-        });
-        state.items = updatedItems;
-        state.totalPrice = action.payload.cart.totalPrice;
-      })
-
-      .addCase(increaseQuantity.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      .addCase(decreaseQuantity.pending, (state) => {
-        state.loading = true;
+        state.cartCount += 1;
       })
       .addCase(decreaseQuantity.fulfilled, (state, action) => {
-        state.loading = false;
-        const updatedItems = state.items.map((item) => {
-          if (item.product._id === action.payload.cart.items[0].product._id) {
-            return { ...item, quantity: action.payload.cart.items[0].quantity };
-          }
-          return item;
-        });
-        state.items = updatedItems;
-        state.totalPrice = action.payload.cart.totalPrice;
-      })
-      .addCase(decreaseQuantity.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.cartCount -= 1;
       });
   },
 });

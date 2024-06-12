@@ -2,9 +2,10 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 const authMiddleware = async (req, res, next) => {
   try {
-    console.log("here")
+
     let token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
 
+   
     // If token is not found in headers, check cookies
     if (!token && req.cookies.token) {
       token = req.cookies.token;
