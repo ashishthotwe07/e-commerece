@@ -27,7 +27,6 @@ class ReviewController {
           .status(400)
           .json({ error: "You have already reviewed this product" });
       }
-      console.log(existingReview);
 
       const review = await Review.create({
         product: productId,
@@ -36,11 +35,44 @@ class ReviewController {
         comment,
       });
 
+      product.reviews.push(review._id); // Add review reference to the product
       await product.save();
 
       res.status(201).json({ message: "Review created successfully", review });
     } catch (error) {
       console.error("Error creating review:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+
+  async deleteReview(req, res) {
+    try {
+      const { reviewId } = req.params;
+      const userId = req.user._id;
+
+      const review = await Review.findOneAndDelete({
+        _id: reviewId,
+        user: userId,
+      });
+
+      if (!review) {
+        return res.status(404).json({ error: "Review not found" });
+      }
+
+      const product = await Product.findById(review.product);
+      if (!product) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      // Remove review reference from the product
+      product.reviews = product.reviews.filter(
+        (reviewRef) => reviewRef.toString() !== review._id.toString()
+      );
+      await product.save();
+
+      res.status(200).json({ message: "Review deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting review:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }
@@ -104,27 +136,6 @@ class ReviewController {
       res.status(200).json({ message: "Review updated successfully", review });
     } catch (error) {
       console.error("Error updating review:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  }
-
-  async deleteReview(req, res) {
-    try {
-      const { reviewId } = req.params;
-      const userId = req.user._id;
-
-      const review = await Review.findOneAndDelete({
-        _id: reviewId,
-        user: userId,
-      });
-
-      if (!review) {
-        return res.status(404).json({ error: "Review not found" });
-      }
-
-      res.status(200).json({ message: "Review deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting review:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }

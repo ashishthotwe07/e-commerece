@@ -44,7 +44,7 @@ app.use("/api/product", ProductRouter);
 app.use("/api/category", categoryRouter);
 app.use("/api/subcategory", subCategory);
 app.use("/api/cart", cartRoutes);
-app.use("/api/reviews", reviewRouter );
+app.use("/api/reviews", reviewRouter);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

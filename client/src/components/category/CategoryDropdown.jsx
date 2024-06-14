@@ -36,8 +36,8 @@ const CategoryDropdown = ({ showImages = true }) => {
 
   return (
     <div
-      className={`sticky top-0 z-10 overflow-x-auto ${
-        !showImages ? "bg-gradient-to-r from-blue-200 to-indigo-300 shadow-md" : "bg-gradient-to-r from-blue-200 to-indigo-300"
+      className={`sticky top-0 z-10 py-1 overflow-x-auto ${
+        !showImages ? "shadow-md" : "bg-white"
       }`}
     >
       <nav className="flex items-center justify-center space-x-4">

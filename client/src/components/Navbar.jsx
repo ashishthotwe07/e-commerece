@@ -16,12 +16,12 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0); // Scroll to the top of the page whenever location changes
+    window.scrollTo(0, 0); 
   }, [location]);
 
   return (
     <>
-      <nav className="block w-full  px-4 py-3 mx-auto text-blue-gray-900 shadow-md bg-white">
+      <nav className="block w-full  px-4  py-3 mx-auto text-blue-gray-900 shadow-lg border-b-2 bg-white">
         <div className="flex flex-wrap items-center justify-between text-blue-gray-900 gap-y-4">
           <Link
             to="/"
@@ -102,7 +102,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      <div className="outlet bg-gradient-to-r from-blue-200 to-indigo-300">
+      <div className="outlet">
         <Outlet />
       </div>
     </>

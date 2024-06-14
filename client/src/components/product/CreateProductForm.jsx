@@ -19,7 +19,11 @@ export default function CreateProductForm({ isOpen, onClose }) {
   const [brand, setBrand] = useState("");
   const [color, setColor] = useState("");
   const [quantity, setQuantity] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
+  const [tags, setTags] = useState("");
   const [loading, setLoading] = useState(false);
+  const [featured, setFeatured] = useState(false);
+  const [onSale, setOnSale] = useState(false);
   const { categories, subcategories } = useSelector(productSelector);
   const dispatch = useDispatch();
 
@@ -58,6 +62,10 @@ export default function CreateProductForm({ isOpen, onClose }) {
     formData.append("brand", brand);
     formData.append("color", color);
     formData.append("quantity", quantity);
+    formData.append("featured", featured);
+    formData.append("onSale", onSale);
+    formData.append("discountPrice", discountPrice);
+    formData.append("tags", tags);
 
     images.forEach((image) => {
       formData.append("images", image);
@@ -85,7 +93,11 @@ export default function CreateProductForm({ isOpen, onClose }) {
     setBrand("");
     setColor("");
     setQuantity("");
+    setDiscountPrice("");
+    setTags("");
     setImages([]);
+    setFeatured(false);
+    setOnSale(false);
     onClose();
   };
 
@@ -99,7 +111,7 @@ export default function CreateProductForm({ isOpen, onClose }) {
         aria-hidden="true"
         className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
       >
-        <div className="relative p-4 w-full max-w-2xl max-h-full">
+        <div className="relative p-4 w-full max-w-3xl max-h-full">
           <div className="relative p-4 bg-white rounded-lg shadow sm:p-5">
             <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5">
               <h3 className="text-lg font-semibold text-gray-900">
@@ -117,7 +129,7 @@ export default function CreateProductForm({ isOpen, onClose }) {
               </button>
             </div>
             <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 mb-4 sm:grid-cols-2">
+              <div className="grid gap-4 mb-4 sm:grid-cols-3">
                 <div>
                   <input
                     type="text"
@@ -209,7 +221,63 @@ export default function CreateProductForm({ isOpen, onClose }) {
                   />
                 </div>
 
-                <div className="sm:col-span-2">
+                <div>
+                  <input
+                    type="number"
+                    value={discountPrice}
+                    onChange={(e) => setDiscountPrice(e.target.value)}
+                    name="discountPrice"
+                    id="discountPrice"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
+                    placeholder="Product discount"
+                    required
+                  />
+                </div>
+                <div className="sm:col-span-3">
+                  <input
+                    type="text"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                    name="tags"
+                    id="tags"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
+                    placeholder="Product Tags comma separated"
+                    required
+                  />
+                </div>
+                <div className="flex items-center ps-4 border border-gray-200 rounded">
+                  <input
+                    id="featured-checkbox"
+                    type="checkbox"
+                    checked={featured}
+                    onChange={(e) => setFeatured(e.target.checked)}
+                    name="featured-checkbox"
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 focus:border-transparent"
+                  />
+                  <label
+                    htmlFor="featured-checkbox"
+                    className="w-full py-2 ms-2 text-sm font-medium text-gray-900"
+                  >
+                    Featured
+                  </label>
+                </div>
+                <div className="flex items-center ps-4 border border-gray-200 rounded">
+                  <input
+                    id="onsale-checkbox"
+                    type="checkbox"
+                    checked={onSale}
+                    onChange={(e) => setOnSale(e.target.checked)}
+                    name="onsale-checkbox"
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 focus:border-transparent"
+                  />
+                  <label
+                    htmlFor="onsale-checkbox"
+                    className="w-full py-2 ms-2 text-sm font-medium text-gray-900"
+                  >
+                    On Sale
+                  </label>
+                </div>
+                <div className="sm:col-span-3">
                   <div className="flex flex-wrap gap-2">
                     {images.map((image, index) => (
                       <div key={index} className="relative">
@@ -230,7 +298,7 @@ export default function CreateProductForm({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-3">
                   <label
                     htmlFor="dropzone-file"
                     className="flex flex-col items-center justify-center w-full h-30 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray
@@ -255,7 +323,7 @@ export default function CreateProductForm({ isOpen, onClose }) {
                     />
                   </label>
                 </div>
-                <div className="sm:col-span-2">
+                <div className="sm:col-span-3">
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}

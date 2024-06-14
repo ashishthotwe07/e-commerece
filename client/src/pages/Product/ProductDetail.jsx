@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { AiOutlineHeart } from "react-icons/ai";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
-import { FiTruck, FiShield } from "react-icons/fi"; // Importing additional icons for shipping and cancel policy
+import { FiTruck, FiShield } from "react-icons/fi";
 import ProductReviews from "./ProductReviews";
 import Loading from "../../utils/Loading";
 import { FaCartPlus } from "react-icons/fa";
@@ -18,7 +18,7 @@ import {
 import { cartSelector } from "../../redux/reducers/cartReducer";
 
 const ProductDetail = () => {
-  const { id } = useParams(); // Get id from URL params
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -65,7 +65,7 @@ const ProductDetail = () => {
         ).unwrap();
         toast.success("Added to cart");
       }
-      await dispatch(fetchCart()).unwrap(); // Ensure state is updated after add/remove
+      await dispatch(fetchCart()).unwrap();
     } catch (error) {
       toast.error("Something went wrong!");
       console.log(error);
@@ -180,8 +180,10 @@ const ProductDetail = () => {
                     1,209 Reviews
                   </p>
                 </div>
+                <div className="flex mt-2 items-end">
+                  <h1 className="text-3xl font-bold">Rs. {product.price}</h1>
+                </div>
 
-                <h2 className="mt-8 text-base text-gray-900">Mfg Brand</h2>
                 <div className="mt-3 flex select-none flex-wrap items-center gap-1">
                   <label>
                     <input
@@ -197,11 +199,24 @@ const ProductDetail = () => {
                   </label>
                 </div>
 
-                <div className="mt-10 flex flex-col items-center justify-between space-y-4 border-t border-b py-4 sm:flex-row sm:space-y-0">
-                  <div className="flex items-end">
-                    <h1 className="text-3xl font-bold">Rs. {product.price}</h1>
+                <div className="mt-8">
+                  <h3 className="text-lg font-bold text-gray-900">Features</h3>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {product.tags && product.tags.length > 0 ? (
+                      product.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700"
+                        >
+                          {tag}
+                        </span>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No tags available</p>
+                    )}
                   </div>
                 </div>
+
                 <div className="mt-8 flex justify-center">
                   <button
                     type="button"
@@ -214,7 +229,7 @@ const ProductDetail = () => {
                     ) : (
                       <>
                         <FaCartPlus className="shrink-0 mr-3 h-5 w-5" />
-                        {isInCart ? "item in Cart" : "Add to Cart"}
+                        {isInCart ? "Item in Cart" : "Add to Cart"}
                       </>
                     )}
                   </button>

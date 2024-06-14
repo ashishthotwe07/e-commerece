@@ -3,6 +3,7 @@ import Category from "../models/category.model.js";
 import Subcategory from "../models/subcategory.model.js";
 import cloudinary from "cloudinary";
 import slugify from "slugify";
+import Review from "../models/productreivew.model.js";
 
 class ProductController {
   async createProduct(req, res) {
@@ -21,8 +22,6 @@ class ProductController {
         })
       );
 
-      console.log(imageUrls);
-      // Extract product details from the request body
       const {
         name,
         description,
@@ -32,6 +31,10 @@ class ProductController {
         subcategoryName,
         brand,
         color,
+        tags,
+        discountPrice,
+        featured,
+        onSale,
       } = req.body;
 
       if (
@@ -86,6 +89,11 @@ class ProductController {
         brand,
         color,
         images: imageUrls,
+        tags: tags ? tags.toUpperCase().split(",") : [],
+        discountPrice,
+
+        featured: featured || false,
+        onSale: onSale || false,
       });
 
       // Respond with success message and created product details
@@ -101,80 +109,6 @@ class ProductController {
         message: "Failed to create product",
         error: error.message,
       });
-    }
-  }
-
-  async getProduct(req, res) {
-    try {
-      const productId = req.params.id;
-      console.log(productId);
-
-      // Find the product by ID
-      const product = await Product.findById(productId).populate(
-        "category subcategory"
-      );
-
-      // Check if the product exists
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
-
-      // Respond with the product details
-      res.status(200).json({
-        success: true,
-        product,
-      });
-    } catch (error) {
-      console.error("Error fetching product:", error);
-      res.status(500).json({
-        success: false,
-        message: "Failed to fetch product",
-        error: error.message,
-      });
-    }
-  }
-
-  async getProducts(req, res) {
-    try {
-      const { subcategory, minPrice, maxPrice, brands, sort, search, colors } =
-        req.query;
-      const colorArray = colors ? colors.split(",") : [];
-
-      // Assuming you're using a MongoDB-like query
-      const query = {
-        subcategory,
-        price: { $gte: minPrice || 0, $lte: maxPrice || Infinity },
-        brand: brands ? { $in: brands.split(",") } : undefined,
-        color: colorArray.length ? { $in: colorArray } : undefined,
-        name: search ? { $regex: search, $options: "i" } : undefined,
-      };
-
-      // Remove undefined fields from the query object
-      Object.keys(query).forEach(
-        (key) => query[key] === undefined && delete query[key]
-      );
-
-      let products = await Product.find(query);
-
-      // Apply sorting
-      if (sort === "Price: Low to High") {
-        products = products.sort((a, b) => a.price - b.price);
-      } else if (sort === "Price: High to Low") {
-        products = products.sort((a, b) => b.price - a.price);
-      } else if (sort === "Best Rating") {
-        products = products.sort((a, b) => b.rating - a.rating);
-      } else if (sort === "Newest") {
-        products = products.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-      }
-
-      res.json({ products });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
     }
   }
 
@@ -202,6 +136,11 @@ class ProductController {
         subcategoryName,
         brand,
         color,
+        tags,
+        discountPrice,
+
+        featured,
+        onSale,
       } = req.body;
 
       const images = req.files || [];
@@ -279,10 +218,12 @@ class ProductController {
       product.description = description || product.description;
       product.price = price || product.price;
       product.quantity = quantity || product.quantity;
-      product.category = category ? category._id : product.category;
-      product.subcategory = subcategory ? subcategory._id : product.subcategory;
       product.brand = brand || product.brand;
       product.color = color || product.color;
+      product.tags = tags ? tags.toUpperCase().split(",") : product.tags;
+      product.discountPrice = discountPrice || null;
+      product.featured = featured || product.featured;
+      product.onSale = onSale || product.onSale;
 
       // Save the updated product
       await product.save();
@@ -294,6 +235,123 @@ class ProductController {
       res.status(500).json({ message: "Internal server error" });
     }
   }
+
+  async getProduct(req, res) {
+    try {
+      const productId = req.params.id;
+
+      // Find the product by ID and populate the category and subcategory
+      const product = await Product.findById(productId)
+        .populate("category subcategory")
+        .populate({
+          path: "reviews",
+          select: "rating",
+        });
+
+      // Check if the product exists
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
+      // Calculate the average rating for the product
+      const ratings = product.reviews.map((review) => review.rating);
+      const totalReviews = product.reviews.length;
+      const averageRating =
+        totalReviews > 0
+          ? ratings.reduce((acc, curr) => acc + curr, 0) / totalReviews
+          : 0;
+
+      // Respond with the product details, total reviews, and average rating
+      res.status(200).json({
+        success: true,
+        product,
+        totalReviews,
+        averageRating,
+      });
+    } catch (error) {
+      console.error("Error fetching product:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch product",
+        error: error.message,
+      });
+    }
+  }
+
+  async getProducts(req, res) {
+    try {
+      const {
+        subcategory,
+        minPrice,
+        maxPrice,
+        brands,
+        sort,
+        search,
+        colors,
+        discount,
+      } = req.query;
+  
+      const colorArray = colors ? colors.split(",") : [];
+  
+      // Construct the query
+      const query = {
+        subcategory,
+        price: { $gte: minPrice || 0, $lte: maxPrice || Infinity },
+        brand: brands ? { $in: brands.split(",") } : undefined,
+        color: colorArray.length ? { $in: colorArray } : undefined,
+        name: search ? { $regex: search, $options: "i" } : undefined,
+      };
+  
+      // Add discount filter only if discount is specified
+      if (discount) {
+        query.discountPrice = { $gte: discount };
+      }
+  
+      // Remove undefined fields from the query object
+      Object.keys(query).forEach(
+        (key) => query[key] === undefined && delete query[key]
+      );
+  
+      // Fetch products matching the query and populate the reviews
+      let products = await Product.find(query).populate({
+        path: "reviews",
+        select: "rating",
+      });
+  
+      // Calculate average rating for each product
+      for (let i = 0; i < products.length; i++) {
+        const product = products[i];
+        const ratings = await Review.find({ product: product._id }).select(
+          "rating"
+        );
+        const totalRating = ratings.reduce((acc, curr) => acc + curr.rating, 0);
+        const averageRating =
+          ratings.length > 0 ? totalRating / ratings.length : 0;
+        product.averageRating = averageRating;
+      }
+  
+      // Apply sorting
+      if (sort === "Price: Low to High") {
+        products = products.sort((a, b) => a.price - b.price);
+      } else if (sort === "Price: High to Low") {
+        products = products.sort((a, b) => b.price - a.price);
+      } else if (sort === "Best Rating") {
+        products = products.sort((a, b) => b.averageRating - a.averageRating);
+      } else if (sort === "Newest") {
+        products = products.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      }
+  
+      res.json({ products });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+  
 
   async deleteProduct(req, res) {
     try {

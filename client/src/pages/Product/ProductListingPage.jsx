@@ -21,6 +21,7 @@ const ProductListingPage = () => {
   const [brands, setBrands] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedDiscount, setSelectedDiscount] = useState(null);
 
   const handleSearchInputChange = (event) => {
     setSearchQuery(event.target.value);
@@ -46,6 +47,11 @@ const ProductListingPage = () => {
     setSortOption(option);
   };
 
+  const handleDiscountChange = (event) => {
+    const value = event.target.value;
+    setSelectedDiscount(selectedDiscount === value ? null : value); // Set to null if the same value is selected again
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
@@ -57,12 +63,27 @@ const ProductListingPage = () => {
             maxPrice,
             brands: brands.join(","),
             sort: sortOption,
+            discount: selectedDiscount || undefined,
             search: searchQuery,
             colors: selectedColors.join(","), // Send selected color names
           },
         });
-        console.log(response.data.products);
-        setProducts(response.data.products);
+        // Calculate average rating for each product
+        const productsWithAvgRating = response.data.products.map((product) => {
+          const totalRating = product.reviews.reduce(
+            (acc, curr) => acc + curr.rating,
+            0
+          );
+          const averageRating =
+            product.reviews.length > 0
+              ? totalRating / product.reviews.length
+              : 0;
+          return {
+            ...product,
+            averageRating: averageRating,
+          };
+        });
+        setProducts(productsWithAvgRating);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -76,6 +97,7 @@ const ProductListingPage = () => {
     minPrice,
     maxPrice,
     brands,
+    selectedDiscount,
     sortOption,
     searchQuery,
     selectedColors,
@@ -360,7 +382,9 @@ const ProductListingPage = () => {
                   <input
                     id="checkbox-default-1"
                     type="checkbox"
-                    defaultValue
+                    value="20"
+                    checked={selectedDiscount === "20"}
+                    onChange={handleDiscountChange}
                     className="w-5 h-5 appearance-none border border-gray-300 rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100 checked:bg-[url('https://pagedone.io/asset/uploads/1689406942.svg')]"
                   />
                   <label
@@ -374,7 +398,9 @@ const ProductListingPage = () => {
                   <input
                     id="checkbox-default-2"
                     type="checkbox"
-                    defaultValue
+                    value="30"
+                    checked={selectedDiscount === "30"}
+                    onChange={handleDiscountChange}
                     className="w-5 h-5 appearance-none border border-gray-300 rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100 checked:bg-[url('https://pagedone.io/asset/uploads/1689406942.svg')]"
                   />
                   <label
@@ -388,7 +414,9 @@ const ProductListingPage = () => {
                   <input
                     id="checkbox-default-3"
                     type="checkbox"
-                    defaultValue
+                    value="50"
+                    checked={selectedDiscount === "50"}
+                    onChange={handleDiscountChange}
                     className="w-5 h-5 appearance-none border border-gray-300 rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100 checked:bg-[url('https://pagedone.io/asset/uploads/1689406942.svg')]"
                   />
                   <label
@@ -428,8 +456,8 @@ const ProductListingPage = () => {
                     images={product.images} // Assuming each product object has an imageUrl property
                     name={product.name}
                     price={product.price}
-                    discount="20%" // Placeholder discount value
-                    rating={4.5} // Placeholder rating value
+                    discount={product.discountPrice} // Placeholder discount value
+                    rating={product.averageRating} // Placeholder rating value
                   />
                 ))}
               </div>

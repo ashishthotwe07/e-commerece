@@ -23,6 +23,14 @@ const productSchema = new Schema(
       required: true,
       default: 0,
     },
+    discountPrice: {
+      type: Number,
+      default: null,
+    },
+    discountPercentage: {
+      type: Number,
+      default: null,
+    },
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
@@ -59,11 +67,32 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
+    tags: [
+      {
+        type: String,
+      },
+    ],
+    reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+    featured: {
+      type: Boolean,
+      default: false,
+    },
+    onSale: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+productSchema.methods.calculateDiscountPercentage = function () {
+  if (this.discountPrice && this.price) {
+    return ((this.price - this.discountPrice) / this.price) * 100;
+  }
+  return null;
+};
 
 const Product = mongoose.model("Product", productSchema);
 

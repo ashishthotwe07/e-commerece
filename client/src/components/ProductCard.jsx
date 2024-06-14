@@ -45,6 +45,9 @@ const ProductCard = ({ id, images, discount, name, price, rating }) => {
     dispatch(fetchCart());
   }, [dispatch]);
 
+  // Calculate discounted price if discount is available
+  const discountedPrice = discount ? price - (price * discount) / 100 : null;
+
   return (
     <div className="relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md">
       <Link
@@ -59,7 +62,7 @@ const ProductCard = ({ id, images, discount, name, price, rating }) => {
 
         {discount && (
           <span className="absolute top-0 left-0 m-1 rounded-full bg-black px-2 text-center text-sm font-medium text-white">
-            {discount} off
+            {discount}% off
           </span>
         )}
       </Link>
@@ -69,12 +72,25 @@ const ProductCard = ({ id, images, discount, name, price, rating }) => {
         </a>
         <div className="mt-2 mb-5 flex items-center justify-between">
           <p>
-            <span className="text-3xl font-bold text-slate-900">${price}</span>
-            <span className="text-sm text-slate-900 line-through">$699</span>
+            {discountedPrice ? (
+              <span className="text-3xl font-bold text-slate-900">
+                ${discountedPrice}
+              </span>
+            ) : (
+              <span className="text-3xl font-bold text-slate-900">
+                ${price}
+              </span>
+            )}
+            {discount && (
+              <span className="text-sm text-slate-900 line-through ml-2">
+                ${price}
+              </span>
+            )}
           </p>
+
           <div className="flex items-center">
             <span className="mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold">
-              {rating}
+              {rating}.0
             </span>
           </div>
         </div>
