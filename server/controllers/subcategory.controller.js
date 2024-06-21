@@ -20,7 +20,6 @@ class SubcategoryController {
         return res.status(400).json({ error: "Subcategory already exists" });
       }
 
-      console.log(categoryName);
       const category = await Category.findById(categoryName);
 
       if (!category) {
@@ -47,7 +46,6 @@ class SubcategoryController {
     try {
       const { categoryName } = req.params;
 
-      console.log(categoryName);
       const category = await Category.findOne({ name: categoryName });
 
       if (!category) {
@@ -75,7 +73,7 @@ class SubcategoryController {
   async getSubcategoryById(req, res) {
     try {
       const { subcategoryId } = req.params;
-      console.log(subcategoryId);
+
       const subcategory = await Subcategory.findById(subcategoryId).populate(
         "category"
       );
@@ -101,7 +99,7 @@ class SubcategoryController {
 
       const slug = slugify(name, { lower: true });
 
-      const category = await Category.findOne({ name: categoryName });
+      const category = await Category.findById(categoryName );
       if (!category) {
         return res.status(404).json({ error: "Category not found" });
       }

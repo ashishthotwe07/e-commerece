@@ -163,9 +163,6 @@ const cartSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(removeFromCart.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.loading = false;
         state.items = state.items.filter(
@@ -180,11 +177,26 @@ const cartSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(increaseQuantity.fulfilled, (state, action) => {
+      .addCase(increaseQuantity.pending, (state, action) => {
         state.cartCount += 1;
       })
-      .addCase(decreaseQuantity.fulfilled, (state, action) => {
+      .addCase(increaseQuantity.rejected, (state, action) => {
         state.cartCount -= 1;
+      })
+      .addCase(decreaseQuantity.pending, (state, action) => {
+        state.cartCount -= 1;
+      })
+      .addCase(decreaseQuantity.rejected, (state, action) => {
+        state.cartCount += 1;
+      })
+      .addCase(clearCart.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = [];
+        state.cartCount = 0;
+      })
+      .addCase(clearCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

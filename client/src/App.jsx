@@ -16,18 +16,18 @@ import "react-toastify/dist/ReactToastify.css";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
-import ResetPasswordConfirmation from "./components/ResetPasswordConfirmation";
-import Profile from "./pages/Profile";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AuthRoute from "./components/AuthRoute";
-import Userprofile from "./components/Userprofile";
-import Category from "./pages/Category/Category";
-import ProductListingPage from "./pages/Product/ProductListingPage";
-import ProductAdminPanel from "./components/product/ProductAdminPanel";
-import SubcategoryPage from "./pages/Subcategory/SubcategoryPage";
-import SubcategoryAdminPanel from "./pages/Subcategory/SubcategoryAdminPanel";
-import CartPage from "./pages/Product/CartPage";
-import ProductDetail from "./pages/Product/ProductDetail";
+import ResetPasswordConfirmation from "./pages/Auth/ResetPasswordConfirmation";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import AuthRoute from "./utils/AuthRoute";
+import Profile from "./pages/Profle";
+import Category from "./Admin/Category/CategoryDashboard";
+import ProductListingPage from "./pages/ProductListingPage";
+import ProductAdminPanel from "./Admin/Product/ProductAdminPanel";
+import SubcategoryPage from "./pages/SubcategoryPage";
+import SubcategoryAdminPanel from "./Admin/subcategory/SubcategoryAdminPanel";
+import CartPage from "./pages/CartPage";
+import ProductDetail from "./pages/ProductDetail";
 
 export default function App() {
   const routes = createBrowserRouter([
@@ -89,7 +89,7 @@ export default function App() {
           ),
         },
         {
-          path: "/product-listing/:subcategoryName",
+          path: "/product-listing/:subcategoryname",
           element: (
             <ProtectedRoute>
               <ProductListingPage />
@@ -116,7 +116,7 @@ export default function App() {
           path: "/user",
           element: (
             <ProtectedRoute>
-              <Profile />
+              <Dashboard />
             </ProtectedRoute>
           ),
           children: [
@@ -124,7 +124,7 @@ export default function App() {
               path: "profile",
               element: (
                 <ProtectedRoute>
-                  <Userprofile />
+                  <Profile />
                 </ProtectedRoute>
               ),
             },

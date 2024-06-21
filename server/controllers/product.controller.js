@@ -52,7 +52,6 @@ class ProductController {
         });
       }
 
-      console.log(categoryName, subcategoryName);
       // Generate slug from category name and product name
       const categorySlug = slugify(categoryName, { lower: true });
       const subcategorySlug = slugify(subcategoryName, { lower: true });
@@ -115,7 +114,7 @@ class ProductController {
   async updateProduct(req, res) {
     try {
       const productId = req.params.productId;
-      console.log(productId);
+
       if (!productId) {
         return res.status(400).json({ message: "Product ID is required" });
       }
@@ -154,7 +153,6 @@ class ProductController {
       if (removedImages) {
         await Promise.all(
           removedImages.map(async (imageId) => {
-            console.log("imageId", imageId);
             product.images = product.images.filter(
               (img) => img.public_id !== imageId
             );
@@ -164,7 +162,6 @@ class ProductController {
       }
 
       if (images) {
-        console.log("images", images);
         const newImageUrls = await Promise.all(
           images.map(async (image) => {
             const b64 = Buffer.from(image.buffer).toString("base64");
@@ -176,18 +173,10 @@ class ProductController {
           })
         );
 
-        console.log("newImageUrls", newImageUrls);
         // Merge new image URLs with existing ones
         product.images = [...product.images, ...newImageUrls];
       }
 
-      console.log(req.body);
-      console.log(
-        "categoryName",
-        categoryName,
-        "subcategoryName",
-        subcategoryName
-      );
       let category, subcategory;
       if (categoryName) {
         const categorySlug = slugify(categoryName, { lower: true });
@@ -292,35 +281,54 @@ class ProductController {
         search,
         colors,
         discount,
+        featured,
+        onSale,
       } = req.query;
-  
+
       const colorArray = colors ? colors.split(",") : [];
-  
+
       // Construct the query
       const query = {
-        subcategory,
         price: { $gte: minPrice || 0, $lte: maxPrice || Infinity },
         brand: brands ? { $in: brands.split(",") } : undefined,
         color: colorArray.length ? { $in: colorArray } : undefined,
         name: search ? { $regex: search, $options: "i" } : undefined,
+        featured: featured === "true" ? true : undefined, // Convert to boolean
+        onSale: onSale === "true" ? true : undefined, // Check if onSale is true
       };
-  
+
       // Add discount filter only if discount is specified
       if (discount) {
         query.discountPrice = { $gte: discount };
       }
-  
+
+      // If subcategory is provided, convert it to a slug and find the corresponding subcategory
+      if (subcategory) {
+        const subcategorySlug = slugify(subcategory, { lower: true });
+        const foundSubcategory = await Subcategory.findOne({
+          slug: subcategorySlug,
+        });
+
+        if (foundSubcategory) {
+          query.subcategory = foundSubcategory._id;
+        } else {
+          return res.json({ products: [] });
+        }
+      }
+
       // Remove undefined fields from the query object
       Object.keys(query).forEach(
         (key) => query[key] === undefined && delete query[key]
       );
-  
+
       // Fetch products matching the query and populate the reviews
-      let products = await Product.find(query).populate({
-        path: "reviews",
-        select: "rating",
-      });
-  
+      let products = await Product.find(query)
+        .populate({
+          path: "reviews",
+          select: "rating",
+        })
+        .limit(featured === "true" ? 10 : undefined); // Limit to 10 if featured is true
+
       // Calculate average rating for each product
       for (let i = 0; i < products.length; i++) {
         const product = products[i];
@@ -332,7 +340,7 @@ class ProductController {
           ratings.length > 0 ? totalRating / ratings.length : 0;
         product.averageRating = averageRating;
       }
-  
+
       // Apply sorting
       if (sort === "Price: Low to High") {
         products = products.sort((a, b) => a.price - b.price);
@@ -345,13 +353,12 @@ class ProductController {
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
       }
-  
+
       res.json({ products });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   }
-  
 
   async deleteProduct(req, res) {
     try {
@@ -382,6 +389,32 @@ class ProductController {
     } catch (error) {
       console.error("Error deleting product:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
+  async getNewArrivals(req, res) {
+    try {
+      // Fetch the newest 10 products, sorted by creation date in descending order
+      let products = await Product.find()
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .populate({
+          path: "reviews",
+          select: "rating",
+        });
+
+      // Respond with the new arrival products
+      res.status(200).json({
+        success: true,
+        products,
+      });
+    } catch (error) {
+      console.error("Error fetching new arrivals:", error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch new arrivals",
+        error: error.message,
+      });
     }
   }
 }

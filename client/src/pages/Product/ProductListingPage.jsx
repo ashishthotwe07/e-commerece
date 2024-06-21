@@ -55,6 +55,7 @@ const ProductListingPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
+      console.log(subcategoryname);
       try {
         const response = await axios.get(`http://localhost:5000/api/product/`, {
           params: {
@@ -185,7 +186,7 @@ const ProductListingPage = () => {
               leaveFrom="transform opacity-100 scale-100"
               leaveTo="transform opacity-0 scale-95"
             >
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Items className="absolute lg:right-0 left-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                   {sortOptions.map((option, index) => (
                     <Menu.Item key={index}>
@@ -448,7 +449,7 @@ const ProductListingPage = () => {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 ml-16 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14 ">
                 {products.map((product) => (
                   <ProductCard
                     key={product.id}

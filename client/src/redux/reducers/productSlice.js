@@ -3,6 +3,21 @@ import axios from "axios";
 
 const baseUrl = "http://localhost:5000/api";
 
+export const fetchProducts = createAsyncThunk(
+  "product/fetchProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${baseUrl}/product?featured=true&subcategory=Mobiles&limit=10`
+      );
+      console.log(response.data);
+      return response.data.products;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Async thunk for creating a product
 export const createProduct = createAsyncThunk(
   "product/createProduct",
@@ -26,13 +41,24 @@ export const createProduct = createAsyncThunk(
   }
 );
 
+export const fetchNewArrivals = createAsyncThunk(
+  "product/fetchNewArrivals",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${baseUrl}/product/new-arrivals`);
+      return response.data.products;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Async thunk for fetching categories
 export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${baseUrl}/category/get`);
-
       return response.data.categories;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -48,7 +74,6 @@ export const fetchSubcategories = createAsyncThunk(
       const response = await axios.get(
         `${baseUrl}/subcategory/get-by-category/${categoryId}`
       );
-      
       return response.data.subcategories;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -60,8 +85,10 @@ const productSlice = createSlice({
   name: "product",
   initialState: {
     products: [],
+    featured: [],
     categories: [],
     subcategories: [],
+    newArrivals: [],
     loading: false,
     error: null,
   },
@@ -102,6 +129,26 @@ const productSlice = createSlice({
         state.subcategories = action.payload;
       })
       .addCase(fetchSubcategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message;
+      })
+      .addCase(fetchProducts.pending, (state) => {
+        // No need to modify the state in pending
+      })
+      .addCase(fetchProducts.fulfilled, (state, action) => {
+        state.featured = action.payload;
+      })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        state.error = action.payload.message;
+      })
+      .addCase(fetchNewArrivals.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchNewArrivals.fulfilled, (state, action) => {
+        state.loading = false;
+        state.newArrivals = action.payload;
+      })
+      .addCase(fetchNewArrivals.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
       });

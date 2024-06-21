@@ -23,7 +23,6 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    console.log("here", decodedToken);
     // Fetch user from database based on token payload
     const user = await User.findById(decodedToken.id);
     if (!user) {
